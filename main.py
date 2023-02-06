@@ -1,6 +1,7 @@
 import random
 import pygame
 from player import *
+from player_ai import *
 
 
 #start the pygame engine
@@ -15,7 +16,7 @@ pygame.mixer.init();
 
 #game variables
 simOver = False
-p1 = Player()
+p1 = PlayerAI()
 map1 = Map()
 camera_offset = (0,0)
 
@@ -34,11 +35,16 @@ def create_map_1():
     map1.add(Platform(600,200,30,400,(0,255,0)))
     map1.add(Platform(715,120,300,30,(0,255,0)))
     map1.add(Platform(740,700,300,30,(0,255,0)))
+    map1.add_coin(Coin(600,650))
+    map1.add_coin(Coin(220,450))
+    map1.add_coin(Coin(730,80))
     map1.set_gravity(-4)
 
 def draw_mouse_coords():
     textSurface = myfont.render(str(pygame.mouse.get_pos()), True, (255,255,255))
     world.blit(textSurface, (50, 30))
+    textSurface = myfont.render(str(p1.get_score()), True, (255,255,255))
+    world.blit(textSurface, (50, 70))
 
 def clear_screen():
     pygame.draw.rect(world, (0,0,0), (0, 0, world.get_rect().width, world.get_rect().height))

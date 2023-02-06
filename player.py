@@ -13,9 +13,20 @@ class Player:
         self.currentJumpVel = 40
         self.maxJumpVel = 40
         self.speed = 10
+        self.score = 0
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+
+    def jump(self):
+        if not self.isJumping:
+            self.isJumping = True
+
+    def move_left(self):
+        self.x += self.speed
+
+    def move_right(self):
+        self.x -= self.speed
 
     def handle_key_presses(self):
         if pygame.key.get_pressed()[pygame.K_SPACE] and not self.isJumping:
@@ -39,7 +50,20 @@ class Player:
         if self.is_map_right_collision():
             self.x = oldx
 
+        self.check_coin_collision()
+
         return (self.x, self.y)
+
+    def check_coin_collision(self):
+        coins = self.map.get_coins()
+        myHitBox = pygame.Rect(self.x, self.y, self.width, self.height)
+        for c in coins:
+            if myHitBox.colliderect(c.getCollisionRect()):
+                coins.remove(c)
+                self.score += 1
+
+    def get_score(self):
+        return self.score
 
     def handleJump(self):
         if self.isJumping:
@@ -106,6 +130,10 @@ class Map:
     def __init__(self, gravity=-0.5):
         self.platforms = []
         self.gravity = gravity
+        self.coins = []
+
+    def add_coin(self, coin):
+        self.coins.append(coin)
 
     def get_gravity(self):
         return self.gravity
@@ -123,7 +151,26 @@ class Map:
 
         return hitBoxes
 
+    def get_coins(self):
+        return self.coins
+
     # Precondition: the platforms list is a homogeneous list of Platform objects
     def draw(self, screen):
         for p in self.platforms:
             p.draw(screen)
+        for c in self.coins:
+            c.draw(screen)
+
+class Coin:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.size = 30
+        self.color = (255,255,0)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+
+    def getCollisionRect(self):
+        return pygame.Rect(self.x, self.y, self.size, self.size)
