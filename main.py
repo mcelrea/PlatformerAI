@@ -48,8 +48,8 @@ def create_map_1():
 def draw_mouse_coords():
     textSurface = myfont.render(str(pygame.mouse.get_pos()), True, (255,255,255))
     world.blit(textSurface, (50, 30))
-    #textSurface = myfont.render(str(p1.get_score()), True, (255,255,255))
-    #world.blit(textSurface, (50, 70))
+    textSurface = myfont.render(str(ai_players[0].get_current_allele()), True, (255,255,255))
+    world.blit(textSurface, (50, 70))
 
 def clear_screen():
     pygame.draw.rect(world, (0,0,0), (0, 0, world.get_rect().width, world.get_rect().height))
@@ -89,6 +89,13 @@ while not simOver:
 
     # player update code
     update_camera()
+
+    # if the first ai is done, they are all done, reset all of them
+    if ai_players[0].is_done():
+        print ("done")
+        for p in ai_players:
+            p.reset()
+
     for p in ai_players:
         p.act()
     x_offset = 0
