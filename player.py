@@ -3,12 +3,12 @@ import pygame
 class Player:
 
     # empty constructor
-    def __init__(self):
+    def __init__(self, color=(255,0,0)):
         self.x = 400
         self.y = 400
         self.width = 30
         self.height = 30
-        self.color = (255,0,0)
+        self.color = color
         self.isJumping = False
         self.currentJumpVel = 40
         self.maxJumpVel = 40
@@ -21,6 +21,12 @@ class Player:
     def jump(self):
         if not self.isJumping:
             self.isJumping = True
+
+    def set_x(self, x):
+        self.x = x
+
+    def get_x(self):
+        return self.x
 
     def move_left(self):
         self.x += self.speed

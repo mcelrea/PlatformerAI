@@ -6,12 +6,15 @@ from player import *
 class PlayerAI:
 
     def __init__(self):
-        self.player = Player()
+        self.player = Player((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
         self.dna = []
         self.create_dna_sequence()
         self.currentAllele = 0
-        self.delay = 1_000_000_000
+        self.delay = 100_000_000
         self.next_act = time.time_ns() + self.delay
+        self.vx = 0
+        self.force_x = 5
+        self.world_force_x = 0.5
 
     def create_dna_sequence(self):
         # 0 - junk DNA - 80%
@@ -19,9 +22,9 @@ class PlayerAI:
         # 2 - move left - 7%
         # 3 - move right - 7%
 
-        for i in range(100):
+        for i in range(500):
             choice = random.randint(1,100)
-            if(choice <= 50): #junk
+            if(choice <= 80): #junk
                 self.dna.append(0)
             elif(choice <= 86): #jump
                 self.dna.append(1)
@@ -36,9 +39,19 @@ class PlayerAI:
             if self.dna[self.currentAllele] == 1:
                 self.player.jump()
             elif self.dna[self.currentAllele] == 2:
-                self.player.move_left()
+                self.vx -= self.force_x
             elif self.dna[self.currentAllele] == 3:
-                self.player.move_right()
+                self.vx += self.force_x
+
+            # add x-velocity to x-position
+            self.player.set_x(self.player.get_x() + self.vx)
+
+            # reduce x-velocity by some world constant (friction)
+            if self.vx < 0:
+                self.vx += self.world_force_x
+            elif self.vx > 0:
+                self.vx -= self.world_force_x
+
             self.next_act = time.time_ns() + self.delay
             self.currentAllele += 1
             print(str(self.currentAllele) + ":" + str(self.dna[self.currentAllele]))

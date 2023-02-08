@@ -16,15 +16,20 @@ pygame.mixer.init();
 
 #game variables
 simOver = False
-p1 = PlayerAI()
+ai_players = []
 map1 = Map()
 camera_offset = (0,0)
+camera_pos = (500,500)
 
 #game independent variables (needed for every pygame)
 FPS = 60 #60 Frames Per Second for the game update cycle
 fpsClock = pygame.time.Clock() #used to lock the game to 60 FPS
 screen = pygame.display.set_mode((1280,720)) #initialize the game window
 world = pygame.Surface((3000,3000))
+
+def create_ai_players():
+    for i in range(50):
+        ai_players.append(PlayerAI())
 
 def create_map_1():
     map1.add(Platform(0,690,2400,30,(0,255,0)))
@@ -43,15 +48,28 @@ def create_map_1():
 def draw_mouse_coords():
     textSurface = myfont.render(str(pygame.mouse.get_pos()), True, (255,255,255))
     world.blit(textSurface, (50, 30))
-    textSurface = myfont.render(str(p1.get_score()), True, (255,255,255))
-    world.blit(textSurface, (50, 70))
+    #textSurface = myfont.render(str(p1.get_score()), True, (255,255,255))
+    #world.blit(textSurface, (50, 70))
 
 def clear_screen():
     pygame.draw.rect(world, (0,0,0), (0, 0, world.get_rect().width, world.get_rect().height))
 
+def update_camera():
+    global camera_pos
+    if pygame.key.get_pressed()[pygame.K_RIGHT]:
+        camera_pos = (camera_pos[0]+10, camera_pos[1])
+    if pygame.key.get_pressed()[pygame.K_LEFT]:
+        camera_pos = (camera_pos[0]-10, camera_pos[1])
+    if pygame.key.get_pressed()[pygame.K_UP]:
+        camera_pos = (camera_pos[0], camera_pos[1]-10)
+    if pygame.key.get_pressed()[pygame.K_DOWN]:
+        camera_pos = (camera_pos[0], camera_pos[1]+10)
+
 # initialize all data before gameplay
 create_map_1()
-p1.setMap(map1)
+create_ai_players()
+for p in ai_players:
+    p.setMap(map1)
 
 #main while loop
 while not simOver:
@@ -65,17 +83,18 @@ while not simOver:
     # draw code
     clear_screen()
     map1.draw(world)
-    p1.draw(world)
+    for p in ai_players:
+        p.draw(world)
     draw_mouse_coords()
 
     # player update code
-    player_pos = p1.act()
+    update_camera()
+    for p in ai_players:
+        p.act()
     x_offset = 0
     y_offset = 0
-    if player_pos[0] > 640:
-        x_offset = 640 - player_pos[0]
-    if player_pos[1] < 350:
-        y_offset = 350 - player_pos[1]
+    x_offset = 640 - camera_pos[0]
+    y_offset = 350 - camera_pos[1]
     camera_offset = (x_offset, y_offset)
     #camera_pos = ((player_pos[0], player_pos[1] - 900))
 
