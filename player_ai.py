@@ -35,6 +35,9 @@ class PlayerAI:
             elif(choice <= 100): #move right
                 self.dna.append(3)
 
+    def get_score(self):
+        return self.x_distance_covered
+
     def is_done(self):
         return self.currentAllele == self.allele_count
 

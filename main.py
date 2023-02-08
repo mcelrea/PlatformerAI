@@ -48,8 +48,8 @@ def create_map_1():
 def draw_mouse_coords():
     textSurface = myfont.render(str(pygame.mouse.get_pos()), True, (255,255,255))
     world.blit(textSurface, (50, 30))
-    textSurface = myfont.render(str(ai_players[0].get_current_allele()), True, (255,255,255))
-    world.blit(textSurface, (50, 70))
+    #textSurface = myfont.render(str(ai_players[0].get_current_allele()), True, (255,255,255))
+    #world.blit(textSurface, (50, 70))
 
 def clear_screen():
     pygame.draw.rect(world, (0,0,0), (0, 0, world.get_rect().width, world.get_rect().height))
@@ -64,6 +64,23 @@ def update_camera():
         camera_pos = (camera_pos[0], camera_pos[1]-10)
     if pygame.key.get_pressed()[pygame.K_DOWN]:
         camera_pos = (camera_pos[0], camera_pos[1]+10)
+
+def sort_ai_by_score():
+    for i in range(len(ai_players)-1):
+        for j in range(len(ai_players)-2):
+            p1 = ai_players[j]
+            p2 = ai_players[j+1]
+            if p1.get_score() < p2.get_score():
+                temp = p1
+                ai_players[j] = p2
+                ai_players[j+1] = temp
+
+# no worky
+def kill_bottom_half():
+    global ai_players
+    newList = ai_players[0:int(len(ai_players)/2)]
+    ai_players.clear()
+    ai_players = newList
 
 # initialize all data before gameplay
 create_map_1()
@@ -94,6 +111,8 @@ while not simOver:
     if ai_players[0].is_done():
         print ("done")
         for p in ai_players:
+            sort_ai_by_score()
+            kill_bottom_half()
             p.reset()
 
     for p in ai_players:
